@@ -29,3 +29,25 @@ def save_new_user(discord_id, boj_id, rating, tier, solved_count, conn: sqlite3.
     """처음 등록하는 사용자일 경우 두 테이블 모두 처리"""
     insert_user_if_not_exists(discord_id, boj_id, rating, conn)
     upsert_user_items(boj_id, rating, tier, solved_count, conn)
+
+def get_user_info(discord_id: str, conn: sqlite3.Connection):
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT user.USER_BOJ_ID, user_items.RATING, user_items.TIER, user_items.SOLVED_COUNT, user_items.UPDATED_AT, user.NUMBER_PER_WEEK
+        FROM user
+        LEFT JOIN user_items ON user.USER_BOJ_ID = user_items.USER_BOJ_ID
+        WHERE user.USER_ID = ?
+    """, (discord_id,))
+
+    row = cursor.fetchone()
+    if row is None:
+        return None
+
+    return {
+        "boj_id": row[0],
+        "rating": row[1],
+        "tier": row[2],
+        "solved_count": row[3],
+        "updated_at": row[4],
+        "number_per_week": row[5]
+    }
