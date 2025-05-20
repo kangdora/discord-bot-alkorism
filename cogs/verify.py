@@ -7,8 +7,8 @@ from api.solvedac_api import solvedac_api
 import util.verify_vaild as verify
 import db.db_utils as db_utils
 
-TARGET_MESSAGE_ID = 1374308065830113322 # 규칙 메시지 ID
-TARGET_CHANNEL_ID = 1374207235705671813 # id 채널
+TARGET_MESSAGE_ID = 1374308065830113322  # 규칙 메시지 ID
+TARGET_CHANNEL_ID = 1374207235705671813  # id 채널
 TARGET_EMOJI = "✅"
 ROLE_NAME_TEMP = "임시"
 ROLE_NAME_MEMBER = "회원"
