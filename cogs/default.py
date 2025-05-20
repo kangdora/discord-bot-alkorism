@@ -12,12 +12,12 @@ class Default(commands.Cog):
 
     @commands.command(name="내정보")
     async def inquiry(self, ctx):
-        if ctx.channal != TARGET_CHANNEL_ID:
+        if ctx.channel.id != TARGET_CHANNEL_ID:
             return
 
         user_id = ctx.author.id
 
-        with sqlite3.connect("data.db") as conn:
+        with sqlite3.connect(r"C:\Users\ioprt\Desktop\개발\discord-bot-alkorism\db\data.db") as conn:
             data = db_utils.get_user_info(user_id, conn)
 
         if data is None:

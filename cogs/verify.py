@@ -10,8 +10,8 @@ import db.db_utils as db_utils
 TARGET_MESSAGE_ID = 1374308065830113322  # 규칙 메시지 ID
 TARGET_CHANNEL_ID = 1374207235705671813  # id 채널
 TARGET_EMOJI = "✅"
-ROLE_NAME_TEMP = "임시"
-ROLE_NAME_MEMBER = "회원"
+ROLE_ID_TEMP = 1374207352454123561
+ROLE_ID_MEMBER = 1373932701727592488
 
 class Verify(commands.Cog):
     def __init__(self, bot):
@@ -30,7 +30,7 @@ class Verify(commands.Cog):
         if member is None:
             return
 
-        role = discord.utils.get(guild.roles, name=ROLE_NAME_TEMP)
+        role = guild.get_role(ROLE_ID_TEMP)
         if role is None:
             return  # 역할이 없으면 무시
 
@@ -67,7 +67,7 @@ class Verify(commands.Cog):
         if verify.is_valid_response(data):
             parsed_data = verify.parse_user_info(data)
 
-            with sqlite3.connect("data.db") as conn:
+            with sqlite3.connect(r"C:\Users\ioprt\Desktop\개발\discord-bot-alkorism\db\data.db") as conn:
                 db_utils.save_new_user(
                     message.author.id,
                     parsed_data["boj_id"],
@@ -80,16 +80,16 @@ class Verify(commands.Cog):
             guild = message.guild
             member = message.author
 
-            role = discord.utils.get(guild.roles, name=ROLE_NAME_MEMBER)
+            role = guild.get_role(ROLE_ID_MEMBER)
             if role is None:
                 return  # 역할이 없으면 무시
 
             # 역할 부여
             if role not in member.roles:
                 await member.add_roles(role)
-                await member.remove_roles(discord.utils.get(guild.roles, name=ROLE_NAME_TEMP))
+                await member.remove_roles(guild.get_role(ROLE_ID_TEMP))
                 print(f"{member.name}에게 인증 역할 부여됨.")
 
 
-def setup(bot):
-    bot.add_cog(Verify(bot))
+async def setup(bot):
+    await bot.add_cog(Verify(bot))
