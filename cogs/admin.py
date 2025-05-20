@@ -1,5 +1,8 @@
 import os
+import sqlite3
+
 from discord.ext import commands
+import db
 
 
 class Admin(commands.Cog):
@@ -39,6 +42,20 @@ class Admin(commands.Cog):
     async def unload(self, ctx, extension: str):
         self.bot.unload_extension(f'cogs.{extension}')
         await ctx.send(f'✅ `{extension}` unloaded.')
+
+    @commands.command(name="유저삭제")
+    @commands.has_permissions(administrator=True)
+    async def delete_user(self, ctx, user):
+
+        with sqlite3.connect(r"C:\Users\ioprt\Desktop\개발\discord-bot-alkorism\db\data.db") as conn:
+            try:
+                db.db_utils.delete_user(user, conn)
+            except Exception as e:
+                await ctx.send("정보를 삭제하는 중 오류가 발생했습니다.")
+                print(f"[오류] 유저삭제 실패: {e}")
+                return
+
+        await ctx.send(f"[성공] {user}의 정보가 성공적으로 지워졌습니다.")
 
 
 async def setup(bot):

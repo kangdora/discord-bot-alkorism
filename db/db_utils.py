@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 def upsert_user_items(boj_id, rating, tier, solved_count, conn: sqlite3.Connection):
     """user_items 테이블에 사용자 정보를 삽입 또는 업데이트"""
@@ -12,7 +12,7 @@ def upsert_user_items(boj_id, rating, tier, solved_count, conn: sqlite3.Connecti
             TIER=excluded.TIER,
             RATING=excluded.RATING,
             UPDATED_AT=excluded.UPDATED_AT;
-    """, (boj_id, solved_count, tier, rating, datetime.utcnow()))
+    """, (boj_id, solved_count, tier, rating, datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M:%S")))
     conn.commit()
 
 def insert_user_if_not_exists(discord_id, boj_id, rating, conn: sqlite3.Connection):
@@ -51,3 +51,21 @@ def get_user_info(discord_id: str, conn: sqlite3.Connection):
         "updated_at": row[4],
         "number_per_week": row[5]
     }
+
+def delete_user(boj_id: str, conn: sqlite3.Connection):
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT USER_ID FROM user WHERE USER_BOJ_ID = ?", (boj_id,))
+    row = cursor.fetchone()
+
+    if not row:
+        print(f"❌ 해당 BOJ ID '{boj_id}'와 매핑된 유저 없음")
+        return
+
+    discord_id = row[0]
+
+    # 삭제
+    cursor.execute("DELETE FROM user WHERE USER_ID = ?", (discord_id,))
+    cursor.execute("DELETE FROM user_items WHERE USER_BOJ_ID = ?", (boj_id,))
+    conn.commit()
+    print(f"✅ 유저 삭제 완료: Discord ID {discord_id}, BOJ ID {boj_id}")
