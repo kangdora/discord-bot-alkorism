@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 import db.db_utils as db_utils
 
+TARGET_CHANNEL_ID = 1373919737892962398  # 채팅방
 
 class Default(commands.Cog):
     def __init__(self, bot):
@@ -11,6 +12,9 @@ class Default(commands.Cog):
 
     @commands.command(name="내정보")
     async def inquiry(self, ctx):
+        if ctx.channal != TARGET_CHANNEL_ID:
+            return
+
         user_id = ctx.author.id
 
         with sqlite3.connect("data.db") as conn:
@@ -31,6 +35,7 @@ class Default(commands.Cog):
         embed.add_field(name="현재 티어", value=data['tier'], inline=False)
         embed.add_field(name="푼 문제 수", value=data['solved_count'], inline=False)
         embed.add_field(name="일 주 목표 개수", value=data['number_per_week'], inline=False)
+        # embed.add_field(name="지난주 레이팅 대비" value=data[''] ~)
 
         embed.set_footer(text=f"information by solved.ac\n마지막 수정 날짜:{data['updated_at']}")
 
