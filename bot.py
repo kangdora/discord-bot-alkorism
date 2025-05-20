@@ -17,7 +17,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
     for filename in os.listdir('./cogs'):
-        if filename.endswith('.py') and filename != '__init__.py':
+        if filename.endswith('.py') and filename not in ['__init__.py', 'command_info.py', 'help.py', 'tier.py']:
             await bot.load_extension(f'cogs.{filename[:-3]}')
             print(f'Loaded: {filename}')
 
