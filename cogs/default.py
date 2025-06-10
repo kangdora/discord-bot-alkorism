@@ -3,6 +3,7 @@ import sqlite3
 import discord
 from discord.ext import commands
 import db.db_utils as db_utils
+from db import DB_PATH
 
 TARGET_CHANNEL_ID = 1373919737892962398  # 채팅방
 
@@ -17,11 +18,11 @@ class Default(commands.Cog):
 
         user_id = ctx.author.id
 
-        with sqlite3.connect(r"C:\Users\ioprt\Desktop\개발\discord-bot-alkorism\db\data.db") as conn:
+        with sqlite3.connect(DB_PATH) as conn:
             data = db_utils.get_user_info(user_id, conn)
 
         if data is None:
-            ctx.send("정보를 불러오는 중 오류가 발생했습니다.")
+            await ctx.send("정보를 불러오는 중 오류가 발생했습니다.")
             return
 
         embed = discord.Embed(

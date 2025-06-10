@@ -6,6 +6,7 @@ from discord.ext import commands
 from api.solvedac_api import solvedac_api
 import util.verify_vaild as verify
 import db.db_utils as db_utils
+from db import DB_PATH
 
 TARGET_MESSAGE_ID = 1374308065830113322  # 규칙 메시지 ID
 TARGET_CHANNEL_ID = 1374207235705671813  # id 채널
@@ -67,7 +68,7 @@ class Verify(commands.Cog):
         if verify.is_valid_response(data):
             parsed_data = verify.parse_user_info(data)
 
-            with sqlite3.connect(r"C:\Users\ioprt\Desktop\개발\discord-bot-alkorism\db\data.db") as conn:
+            with sqlite3.connect(DB_PATH) as conn:
                 db_utils.save_new_user(
                     message.author.id,
                     parsed_data["boj_id"],
