@@ -2,6 +2,9 @@ import os
 import sqlite3
 
 from discord.ext import commands
+
+from api.solvedac_api import solvedac_api
+import util.verify_vaild as verify
 import db.db_utils as db_utils
 from db import DB_PATH
 
@@ -57,6 +60,36 @@ class Admin(commands.Cog):
                 return
 
         await ctx.send(f"[성공] {user}의 정보가 성공적으로 지워졌습니다.")
+
+    @commands.command(name="유저갱신전체")
+    @commands.has_permissions(administrator=True)
+    async def refresh_all_users(self, ctx):
+        """DB에 등록된 모든 유저 정보를 solved.ac에서 갱신"""
+        with sqlite3.connect(DB_PATH) as conn:
+            boj_ids = db_utils.get_all_boj_ids(conn)
+            updated = 0
+            for boj_id in boj_ids:
+                try:
+                    data = solvedac_api(boj_id)
+                except Exception as e:
+                    await ctx.send(f"❌ {boj_id} 업데이트 실패: {e}")
+                    continue
+
+                if not verify.is_valid_response(data):
+                    await ctx.send(f"❌ {boj_id} 데이터 오류")
+                    continue
+
+                parsed = verify.parse_user_info(data)
+                db_utils.upsert_user_items(
+                    parsed["boj_id"],
+                    parsed["rating"],
+                    parsed["tier"],
+                    parsed["solved_count"],
+                    conn,
+                )
+                updated += 1
+
+        await ctx.send(f"✅ {updated}명 유저 정보 갱신 완료")
 
 
 async def setup(bot):

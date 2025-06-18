@@ -69,3 +69,10 @@ def delete_user(boj_id: str, conn: sqlite3.Connection):
     cursor.execute("DELETE FROM user_items WHERE USER_BOJ_ID = ?", (boj_id,))
     conn.commit()
     print(f"✅ 유저 삭제 완료: Discord ID {discord_id}, BOJ ID {boj_id}")
+
+
+def get_all_boj_ids(conn: sqlite3.Connection):
+    """등록된 모든 백준 ID 목록을 반환"""
+    cursor = conn.cursor()
+    cursor.execute("SELECT USER_BOJ_ID FROM user_items")
+    return [row[0] for row in cursor.fetchall()]
