@@ -13,7 +13,7 @@ class Admin(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def reload(self, ctx, extension: str):
         try:
-            self.bot.reload_extension(f'cogs.{extension}')
+            await self.bot.reload_extension(f'cogs.{extension}')
             await ctx.send(f'✅ `{extension}` reloaded.')
         except Exception as e:
             await ctx.send(f'❌ Reload failed: {e}')
@@ -27,7 +27,7 @@ class Admin(commands.Cog):
             if filename.endswith('.py') and filename != '__init__.py':
                 extension = filename[:-3]
                 try:
-                    self.bot.load_extension(f'cogs.{extension}')
+                    await self.bot.load_extension(f'cogs.{extension}')
                     loaded.append(extension)
                 except Exception as e:
                     failed.append((extension, str(e)))
@@ -40,7 +40,7 @@ class Admin(commands.Cog):
     @commands.command(name="언로드")
     @commands.has_permissions(administrator=True)
     async def unload(self, ctx, extension: str):
-        self.bot.unload_extension(f'cogs.{extension}')
+        await self.bot.unload_extension(f'cogs.{extension}')
         await ctx.send(f'✅ `{extension}` unloaded.')
 
     @commands.command(name="유저삭제")
@@ -56,6 +56,12 @@ class Admin(commands.Cog):
                 return
 
         await ctx.send(f"[성공] {user}의 정보가 성공적으로 지워졌습니다.")
+
+    @commands.command(name="삭제")
+    @commands.has_permissions(administrator=True)
+    async def delete_message(self, ctx, count: int):
+        deleted = await ctx.channel.purge(limit=count + 1)  # 명령어 메시지까지 포함
+        await ctx.send(f"{len(deleted) - 1}개의 메시지를 삭제했습니다.", delete_after=3)
 
 
 async def setup(bot):

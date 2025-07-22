@@ -1,6 +1,5 @@
 import sqlite3
 
-import discord
 from discord.ext import commands
 
 from api.solvedac_api import solvedac_api
@@ -51,6 +50,9 @@ class Verify(commands.Cog):
         print(f"[감지됨] {message.author}가 메시지 보냄: {message.content}")
 
         if not verify.is_valid_id(message.content):
+            return
+
+        if message.content[0] == "!":
             return
 
         try:
